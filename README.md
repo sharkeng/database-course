@@ -145,3 +145,208 @@ SELECT * FROM labor_activity
 | 51055 | Суббота | 5 | 5 | 4 | 2 | 22000 |
 | 51056 | Суббота | 3 | 6 | 3 | 2 | 22000 |
 
+№ 4
+```sql
+select distinct address from medical_staffs;
+```
+| address |
+| :--- |
+| Выкса |
+| Починки |
+| Вознесенское |
+| Навашино |
+```sql
+select distinct establishment from place_of_works;
+```
+| establishment |
+| :--- |
+| Травм. пункт |
+| Больница |
+| Род. дом |
+| Районная больница |
+
+```sql
+select distinct date from labor_activity;
+```
+| date |
+| :--- |
+| Четверг |
+| Понедельник |
+| Пятница |
+| Среда |
+| Суббота |
+
+№ 5
+```sql
+select  contract,date
+from labor_activity
+where payment>=14000;
+```
+| contract | date |
+| :--- | :--- |
+| 51040 | Понедельник |
+| 51041 | Понедельник |
+| 51042 | Понедельник |
+| 51043 | Понедельник |
+| 51044 | Понедельник |
+| 51045 | Среда |
+| 51046 | Четверг |
+| 51047 | Четверг |
+| 51048 | Четверг |
+| 51050 | Пятница |
+| 51051 | Пятница |
+| 51052 | Пятница |
+| 51055 | Суббота |
+| 51056 | Суббота |
+
+```sql
+select distinct address, tax
+from medical_staffs
+where address = 'Навашино'
+   or address = 'Выкса';
+```
+| address | tax |
+| :--- | :--- |
+| Выкса | 10 |
+| Навашино | 14 |
+
+```sql
+select name, strong_point, cost
+from types_of_operations
+where cost > 10000
+  and name LIKE '%Инъекция%'
+order by strong_point, cost;
+```
+| name | strong\_point | cost |
+| :--- | :--- | :--- |
+| Инъекция поливитаминов | Навашино | 11000 |
+| Инъекция алоэ | Навашино | 11000 |
+
+№ 6
+```sql
+select date, surname, establishment, name
+from medical_staffs,
+     labor_activity,
+     place_of_works,
+     types_of_operations
+where medical_stuff = medical_staffs.id
+  and place_of_work = place_of_works.id
+  and type_of_operation = types_of_operations.id
+```
+| date | surname | establishment | name |
+| :--- | :--- | :--- | :--- |
+| Понедельник | Медина | Районная больница | Флюорография |
+| Понедельник | Бессонов | Больница | УЗИ |
+| Понедельник | Губанов | Больница | Инъекция алоэ |
+| Понедельник | Губанов | Больница | Наложение гипса |
+| Понедельник | Губанов | Род. дом | УЗИ |
+| Среда | Севастьянов | Травм. пункт | ЭКГ |
+| Четверг | Бессонов | Травм. пункт | Инъекция алоэ |
+| Четверг | Губанов | Травм. пункт | Блокада |
+| Четверг | Боева | Больница | Инъекция поливитаминов |
+| Пятница | Севастьянов | Род. дом | ЭКГ |
+| Пятница | Бессонов | Травм. пункт | Инъекция алоэ |
+| Пятница | Бессонов | Больница | Наложение гипса |
+| Пятница | Боева | Больница | Блокада |
+| Суббота | Бессонов | Травм. пункт | Флюорография |
+| Суббота | Губанов | Травм. пункт | Инъекция алоэ |
+| Суббота | Боева | Больница | Инъекция алоэ |
+| Суббота | Бессонов | Травм. пункт | Инъекция поливитаминов |
+
+```sql
+select date, establishment, quantity,payment
+from
+     labor_activity,
+     place_of_works
+where place_of_work = place_of_works.id
+order by payment
+```
+| date | establishment | quantity | payment |
+| :--- | :--- | :--- | :--- |
+| Пятница | Род. дом | 1 | 10000 |
+| Суббота | Травм. пункт | 2 | 10000 |
+| Суббота | Травм. пункт | 1 | 11000 |
+| Пятница | Больница | 1 | 14000 |
+| Понедельник | Районная больница | 4 | 20000 |
+| Суббота | Травм. пункт | 2 | 22000 |
+| Пятница | Травм. пункт | 2 | 22000 |
+| Суббота | Больница | 2 | 22000 |
+| Четверг | Травм. пункт | 1 | 28000 |
+| Среда | Травм. пункт | 3 | 30000 |
+| Понедельник | Больница | 1 | 30000 |
+| Понедельник | Род. дом | 1 | 30000 |
+| Понедельник | Больница | 3 | 33000 |
+| Понедельник | Больница | 2 | 36000 |
+| Пятница | Больница | 2 | 36000 |
+| Четверг | Больница | 4 | 44000 |
+| Четверг | Травм. пункт | 4 | 44000 |
+
+
+№ 7
+```sql
+select surname, address
+from labor_activity,
+     medical_staffs,
+     types_of_operations
+where medical_stuff = medical_staffs.id
+  and type_of_operation = types_of_operations.id
+  and name = 'Наложение гипса'
+  and quantity > 1
+```
+| surname | address |
+| :--- | :--- |
+| Губанов | Выкса |
+| Бессонов | Выкса |
+
+```sql
+select name, address
+from labor_activity,
+     place_of_works,
+     types_of_operations
+where place_of_work = place_of_works.id
+  and type_of_operation = types_of_operations.id
+  and (address = 'Выкса' or address = 'Вознесенское')
+  and establishment LIKE '%больница%';
+```
+| name | address |
+| :--- | :--- |
+| Флюорография | Вознесенское |
+
+```sql
+select establishment, deduction_to_the_local_budget, surname
+from place_of_works,
+     medical_staffs
+where tax >= 7
+  and tax <= 16
+  and place_of_works.address = medical_staffs.address
+order by tax, deduction_to_the_local_budget
+```
+| establishment | deduction\_to\_the\_local\_budget | surname |
+| :--- | :--- | :--- |
+| Травм. пункт | 3 | Губанов |
+| Травм. пункт | 3 | Бессонов |
+| Больница | 4 | Севастьянов |
+| Районная больница | 10 | Медина |
+| Род. дом | 12 | Медина |
+
+```sql
+select date, type_of_operation, surname, cost, quantity
+from types_of_operations,
+     medical_staffs,
+     labor_activity
+where type_of_operation = types_of_operations.id
+  and medical_stuff = medical_staffs.id
+  and cost > 7000
+  and quantity > 1;
+```
+| date | type\_of\_operation | surname | cost | quantity |
+| :--- | :--- | :--- | :--- | :--- |
+| Четверг | 4 | Бессонов | 11000 | 4 |
+| Пятница | 4 | Бессонов | 11000 | 2 |
+| Пятница | 1 | Бессонов | 18000 | 2 |
+| Суббота | 3 | Бессонов | 11000 | 2 |
+| Четверг | 3 | Боева | 11000 | 4 |
+| Суббота | 4 | Боева | 11000 | 2 |
+| Понедельник | 4 | Губанов | 11000 | 3 |
+| Понедельник | 1 | Губанов | 18000 | 2 |
+| Среда | 5 | Севастьянов | 10000 | 3 |
