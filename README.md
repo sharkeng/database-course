@@ -330,7 +330,7 @@ order by tax, deduction_to_the_local_budget
 | Род. дом | 12 | Медина |
 
 ```sql
-select date, type_of_operation, surname, cost, quantity
+select date, type_of_operation, surname
 from types_of_operations,
      medical_staffs,
      labor_activity
@@ -339,14 +339,46 @@ where type_of_operation = types_of_operations.id
   and cost > 7000
   and quantity > 1;
 ```
-| date | type\_of\_operation | surname | cost | quantity |
-| :--- | :--- | :--- | :--- | :--- |
-| Четверг | 4 | Бессонов | 11000 | 4 |
-| Пятница | 4 | Бессонов | 11000 | 2 |
-| Пятница | 1 | Бессонов | 18000 | 2 |
-| Суббота | 3 | Бессонов | 11000 | 2 |
-| Четверг | 3 | Боева | 11000 | 4 |
-| Суббота | 4 | Боева | 11000 | 2 |
-| Понедельник | 4 | Губанов | 11000 | 3 |
-| Понедельник | 1 | Губанов | 18000 | 2 |
-| Среда | 5 | Севастьянов | 10000 | 3 |
+| date | type\_of\_operation | surname |
+| :--- | :--- | :--- |
+| Понедельник | 4 | Губанов |
+| Понедельник | 1 | Губанов |
+| Среда | 5 | Севастьянов |
+| Четверг | 4 | Бессонов |
+| Четверг | 3 | Боева |
+| Пятница | 4 | Бессонов |
+| Пятница | 1 | Бессонов |
+| Суббота | 4 | Боева |
+| Суббота | 3 | Бессонов |
+
+№ 7
+```sql
+```
+
+
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+
