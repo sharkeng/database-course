@@ -98,7 +98,7 @@ VALUES (51040, 'Понедельник', 001, 001, 007, 4, 20000),
 
 ```sql
 SELECT *
-FROM medical_staffs
+FROM medical_staffs;
 ```
 
 | id | surname | address | tax |
@@ -111,7 +111,7 @@ FROM medical_staffs
 
 ```sql
 SELECT *
-FROM place_of_works
+FROM place_of_works;
 ```
 
 | id | establishment | address | deduction\_to\_the\_local\_budget |
@@ -125,7 +125,7 @@ FROM place_of_works
 
 ```sql
 SELECT *
-FROM types_of_operations
+FROM types_of_operations;
 ```
 
 | id | name | strong\_point | stocks | cost |
@@ -140,7 +140,7 @@ FROM types_of_operations
 
 ```sql
 SELECT *
-FROM labor_activity
+FROM labor_activity;
 ```
 
 | contract | date | medical\_stuff | place\_of\_work | type\_of\_operation | quantity | payment |
@@ -262,7 +262,7 @@ from medical_staffs,
      types_of_operations
 where medical_stuff = medical_staffs.id
   and place_of_work = place_of_works.id
-  and type_of_operation = types_of_operations.id
+  and type_of_operation = types_of_operations.id;
 ```
 
 | date | surname | establishment | name |
@@ -290,7 +290,7 @@ select date, establishment, quantity, payment
 from labor_activity,
      place_of_works
 where place_of_work = place_of_works.id
-order by payment
+order by payment;
 ```
 
 | date | establishment | quantity | payment |
@@ -313,7 +313,7 @@ order by payment
 | Четверг | Больница | 4 | 44000 |
 | Четверг | Травм. пункт | 4 | 44000 |
 
-№ 7
+№ 7 a) фамилии и места проживания медперсонала, проведших более одного наложения гипса в день
 
 ```sql
 select surname, address
@@ -323,7 +323,7 @@ from labor_activity,
 where medical_stuff = medical_staffs.id
   and type_of_operation = types_of_operations.id
   and name = 'Наложение гипса'
-  and quantity > 1
+  and quantity > 1;
 ```
 
 | surname | address |
@@ -331,38 +331,55 @@ where medical_stuff = medical_staffs.id
 | Губанов | Выкса |
 | Бессонов | Выкса |
 
+b) название операций, которые проводили врачи из Вознесенского или Выксы в больницах;
+
 ```sql
-select name, address
+select distinct name
 from labor_activity,
      place_of_works,
+     medical_staffs as ms,
      types_of_operations
 where place_of_work = place_of_works.id
   and type_of_operation = types_of_operations.id
-  and (address = 'Выкса' or address = 'Вознесенское')
-  and establishment LIKE '%больница%';
+  and medical_stuff = ms.id
+  and (ms.address = 'Выкса' or ms.address = 'Вознесенское')
+  and (establishment LIKE '%Больница%' or establishment LIKE '%больница%');
 ```
 
-| name | address |
-| :--- | :--- |
-| Флюорография | Вознесенское |
+| name |
+| :--- |
+| Инъекция алоэ |
+| Наложение гипса |
+| УЗИ |
+| Флюорография |
+
+c) названия и размер отчислений в местный бюджет для тех учреждений, где проводили операции те, у кого налог не менее
+7%, но не более 16%. Включить в вывод фамилии таких людей и отсортировать по размеру отчислений и налогу;
 
 ```sql
-select establishment, deduction_to_the_local_budget, surname
+select DISTINCT establishment, place_of_works.deduction_to_the_local_budget, surname, tax
 from place_of_works,
-     medical_staffs
+     medical_staffs,
+     labor_activity
 where tax >= 7
   and tax <= 16
-  and place_of_works.address = medical_staffs.address
-order by tax, deduction_to_the_local_budget
+  and place_of_work = place_of_works.id
+  and medical_stuff = medical_staffs.id
+order by place_of_works.deduction_to_the_local_budget, tax;
 ```
 
-| establishment | deduction\_to\_the\_local\_budget | surname |
-| :--- | :--- | :--- |
-| Травм. пункт | 3 | Губанов |
-| Травм. пункт | 3 | Бессонов |
-| Больница | 4 | Севастьянов |
-| Районная больница | 10 | Медина |
-| Род. дом | 12 | Медина |
+| establishment | deduction\_to\_the\_local\_budget | surname | tax |
+| :--- | :--- | :--- | :--- |
+| Травм. пункт | 3 | Бессонов | 10 |
+| Травм. пункт | 3 | Губанов | 10 |
+| Травм. пункт | 3 | Севастьянов | 14 |
+| Больница | 4 | Бессонов | 10 |
+| Больница | 4 | Губанов | 10 |
+| Районная больница | 10 | Медина | 14 |
+| Род. дом | 12 | Губанов | 10 |
+| Род. дом | 12 | Севастьянов | 14 |
+
+d) даты, идентификаторы операций и фамилии тех, кто проводил операции стоимостью не менее 7000руб больше одного раза.
 
 ```sql
 select date, type_of_operation, surname
@@ -420,7 +437,7 @@ FROM labor_activity;
 
 №9 Расширить таблицу с данными об операциях столбцом, содержащим величину отчислений в местный бюджет для
 мед.учреждения, где проводилась операция. Создать запрос для ввода конкретных значений во все строки таблицы операций.
-
+(???? мы правильно поняли что в эту таблицу???)
 ```sql
 ALTER TABLE labor_activity
     ADD COLUMN deduction_to_the_local_budget INT;
@@ -465,11 +482,10 @@ where medical_stuff = medical_staffs.id
   and place_of_works.address = 'Выкса'
   and types_of_operations.name in (select tofo.name
                                    from types_of_operations as tofo
-                                   where tofo.name like '%Инъекция%')
+                                   where tofo.name like '%Инъекция%');
 
 ```
 таких значений нет((((
-
 
 b) найти те операции, которые не проводились до среды;
 
@@ -482,7 +498,7 @@ where id = type_of_operation
                    from types_of_operations,
                         labor_activity
                    where id = labor_activity.type_of_operation
-                     and (date = 'Понедельник' or date = 'Вторник'))
+                     and (date = 'Понедельник' or date = 'Вторник'));
 ```
 
 | name |
@@ -491,29 +507,38 @@ where id = type_of_operation
 | Инъекция поливитаминов |
 | ЭКГ |
 
-c) запросы задания 7.с и 7.d.
-c) названия и размер отчислений в местный бюджет для тех учреждений, где проводили
+c) запросы задания 7.с и 7.d. c) названия и размер отчислений в местный бюджет для тех учреждений, где проводили
 операции те, у кого налог не менее 7%, но не более 16%. Включить в вывод фамилии таких людей и отсортировать по размеру
 отчислений и налогу;
-```sql
-select establishment, deduction_to_the_local_budget, surname
-from place_of_works,
-     medical_staffs
-where place_of_works.address = medical_staffs.address
-and tax in (select ms.tax from medical_staffs as ms where ms.tax >= 7
-  and ms.tax <= 16)
-order by tax, deduction_to_the_local_budget
-```
-| establishment | deduction\_to\_the\_local\_budget | surname |
-| :--- | :--- | :--- |
-| Травм. пункт | 3 | Губанов |
-| Травм. пункт | 3 | Бессонов |
-| Больница | 4 | Севастьянов |
-| Районная больница | 10 | Медина |
-| Род. дом | 12 | Медина |
 
-d) даты, идентификаторы операций и фамилии тех, кто проводил операции стоимостью не менее 7000руб
-больше одного раза.
+```sql
+select distinct establishment, place_of_works.deduction_to_the_local_budget, surname, tax
+from place_of_works,
+     medical_staffs,
+     labor_activity
+where place_of_work = place_of_works.id
+  and medical_stuff = medical_staffs.id
+  and tax in (select ms.tax
+              from medical_staffs as ms
+              where ms.tax >= 7
+                and ms.tax <= 16)
+order by deduction_to_the_local_budget,tax;
+```
+
+| establishment | deduction\_to\_the\_local\_budget | surname | tax |
+| :--- | :--- | :--- | :--- |
+| Травм. пункт | 3 | Бессонов | 10 |
+| Травм. пункт | 3 | Губанов | 10 |
+| Травм. пункт | 3 | Севастьянов | 14 |
+| Больница | 4 | Бессонов | 10 |
+| Больница | 4 | Губанов | 10 |
+| Районная больница | 10 | Медина | 14 |
+| Род. дом | 12 | Губанов | 10 |
+| Род. дом | 12 | Севастьянов | 14 |
+
+
+d) даты, идентификаторы операций и фамилии тех, кто проводил операции стоимостью не менее 7000руб больше одного раза.
+
 ```sql
 select date, type_of_operation, surname
 from types_of_operations,
@@ -521,8 +546,10 @@ from types_of_operations,
      labor_activity
 where type_of_operation = types_of_operations.id
   and medical_stuff = medical_staffs.id
-  and quantity > 1 and type_of_operation in (select tofop.id from types_of_operations as tofop where tofop.cost>7000);
+  and quantity > 1
+  and type_of_operation in (select tofop.id from types_of_operations as tofop where tofop.cost > 7000);
 ```
+
 | date | type\_of\_operation | surname |
 | :--- | :--- | :--- |
 | Пятница | 1 | Бессонов |
@@ -535,51 +562,102 @@ where type_of_operation = types_of_operations.id
 | Понедельник | 4 | Губанов |
 | Среда | 5 | Севастьянов |
 
-
 №11
-11. Используя операции ALL-ANY реализовать следующие запросы:
+ Используя операции ALL-ANY реализовать следующие запросы:
 
 a) найти среди больниц ту, которая имеет наименьший процент отчислений;
 
 ```sql
 select establishment, address
 from place_of_works
-where deduction_to_the_local_budget <= ALL (
+where (establishment LIKE '%больница%'
+    or establishment LIKE '%Больница%')
+  and deduction_to_the_local_budget <= ALL (
     select pw.deduction_to_the_local_budget
-    from place_of_works as pw)
+    from place_of_works as pw
+    WHERE pw.establishment LIKE '%больница%'
+       or pw.establishment LIKE '%Больница%');
 ```
+(Эти больницы делают одинаковое отчислиние в процентах)
+
+
 | establishment | address |
 | :--- | :--- |
-| Травм. пункт | Выкса |
-| Травм. пункт | Лукояново |
-
-
+| Больница | Навашино |
+| Больница | Починки |
 
 b) найти медперсонал, проводивший операции с самой малой суммой оплаты;
 
 ```sql
-select  surname,payment
-from medical_staffs,labor_activity
-where medical_stuff=medical_staffs.id and
-      payment <= ALL (
+select surname, payment
+from medical_staffs,
+     labor_activity
+where medical_stuff = medical_staffs.id
+  and payment <= ALL (
     select la.payment
-    from labor_activity as la)
+    from labor_activity as la);
 ```
+
 | surname | payment |
 | :--- | :--- |
 | Севастьянов | 8600 |
 
-
 c) найти цену самой дорогой операции, проведенной в четверг или пятницу;
 
 ```sql
+select name, cost
+from types_of_operations,
+     labor_activity
+where type_of_operation = id
+  and (date = 'Четверг' or date = 'Пятница')
+  and cost >= ALL (
+    select tofo.cost
+    from types_of_operations as tofo,
+         labor_activity as la
+    where la.type_of_operation = tofo.id
+      and (la.date = 'Четверг' or la.date = 'Пятница'))
 ```
 
+| name | cost |
+| :--- | :--- |
+| Наложение гипса | 18000 |
 
 d) запрос задания 7.а.
 a) фамилии и места проживания медперсонала, проведших более одного наложения гипса в день;
-```sql
 
+```sql
+SELECT surname, address
+FROM medical_staffs
+WHERE medical_staffs.id = ANY (
+    SELECT DISTINCT medical_stuff
+    FROM labor_activity,
+         types_of_operations
+    WHERE type_of_operation = types_of_operations.id
+      and name = 'Наложение гипса'
+      and quantity > 1
+);
 ```
+| surname | address |
+| :--- | :--- |
+| Бессонов | Выкса |
+| Губанов | Выкса |
+
+№12 
+Используя операцию UNION получить места проживания медпероснала и опероные пункты для операций.
+
+```sql
+SELECT strong_point
+FROM types_of_operations
+UNION
+SELECT address
+FROM medical_staffs;
+```
+| strong\_point |
+| :--- |
+| Выкса |
+| Навашино |
+| Починки |
+| Вознесенское |
+
 
 
