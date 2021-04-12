@@ -1,48 +1,53 @@
 # LAB 1
+
 ## Сделали ученики 19ПИ-2:
-* ***Шарунов Евгений Александрович*** 
+
+* ***Шарунов Евгений Александрович***
 * ***Шатилов Виктор Кенгович***
-№ 1
+  № 1
+
 ```sql
 create table medical_staffs
 (
-	id serial primary key,
-	surname varchar not null,
-	address varchar not null,
-	tax int not null
+    id      serial primary key,
+    surname varchar not null,
+    address varchar not null,
+    tax     int     not null
 );
 create table place_of_works
 (
-	id serial primary key,
-	establishment varchar not null,
-	address varchar not null,
-	deduction_to_the_local_budget int not null
+    id                            serial primary key,
+    establishment                 varchar not null,
+    address                       varchar not null,
+    deduction_to_the_local_budget int     not null
 );
 create table types_of_operations
 (
-	id serial primary key,
-	name varchar not null,
-	strong_point varchar not null,
-	stocks int not null,
-	cost int not null
+    id           serial primary key,
+    name         varchar not null,
+    strong_point varchar not null,
+    stocks       int     not null,
+    cost         int     not null
 );
 create table labor_activity
 (
-	contract serial primary key,
-	date varchar not null,
-	medical_stuff serial not null references medical_staffs(id),
-	place_of_work serial not null references place_of_works(id),
-	type_of_operation serial not null references types_of_operations(id),
-	quantity int not null,
-	payment int not null
+    contract          serial primary key,
+    date              varchar not null,
+    medical_stuff     serial  not null references medical_staffs (id),
+    place_of_work     serial  not null references place_of_works (id),
+    type_of_operation serial  not null references types_of_operations (id),
+    quantity          int     not null,
+    payment           int     not null
 );
 ```
+
 № 2
+
 ```sql
 INSERT INTO medical_staffs
     (id, surname, address, tax)
-VALUES (001, 'Медина','Вознесенское', 14),
-       (002, 'Севастьянов','Навашино', 14),
+VALUES (001, 'Медина', 'Вознесенское', 14),
+       (002, 'Севастьянов', 'Навашино', 14),
        (003, 'Бессонов', 'Выкса', 10),
        (004, 'Губанов', 'Выкса', 10),
        (005, 'Боева', 'Починки', 5);
@@ -88,10 +93,14 @@ VALUES (51040, 'Понедельник', 001, 001, 007, 4, 20000),
        (51056, 'Суббота', 003, 006, 003, 2, 22000);
 
 ```
+
 № 3
+
 ```sql
-SELECT * FROM medical_staffs
+SELECT *
+FROM medical_staffs
 ```
+
 | id | surname | address | tax |
 | :--- | :--- | :--- | :--- |
 | 1 | Медина | Вознесенское | 14 |
@@ -99,9 +108,12 @@ SELECT * FROM medical_staffs
 | 3 | Бессонов | Выкса | 10 |
 | 4 | Губанов | Выкса | 10 |
 | 5 | Боева | Починки | 5 |
+
 ```sql
-SELECT * FROM place_of_works
+SELECT *
+FROM place_of_works
 ```
+
 | id | establishment | address | deduction\_to\_the\_local\_budget |
 | :--- | :--- | :--- | :--- |
 | 1 | Районная больница | Вознесенское | 10 |
@@ -110,9 +122,12 @@ SELECT * FROM place_of_works
 | 4 | Род. дом | Вознесенское | 12 |
 | 5 | Больница | Починки | 4 |
 | 6 | Травм. пункт | Лукояново | 3 |
+
 ```sql
-SELECT * FROM types_of_operations
+SELECT *
+FROM types_of_operations
 ```
+
 | id | name | strong\_point | stocks | cost |
 | :--- | :--- | :--- | :--- | :--- |
 | 1 | Наложение гипса | Выкса | 2000 | 18000 |
@@ -122,9 +137,12 @@ SELECT * FROM types_of_operations
 | 5 | ЭКГ | Вознесенское | 115 | 10000 |
 | 6 | УЗИ | Вознесенское | 20 | 30000 |
 | 7 | Флюорография | Выкса | 1000 | 5000 |
+
 ```sql
-SELECT * FROM labor_activity
+SELECT *
+FROM labor_activity
 ```
+
 | contract | date | medical\_stuff | place\_of\_work | type\_of\_operation | quantity | payment |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 51040 | Понедельник | 1 | 1 | 7 | 4 | 20000 |
@@ -146,18 +164,24 @@ SELECT * FROM labor_activity
 | 51056 | Суббота | 3 | 6 | 3 | 2 | 22000 |
 
 № 4
+
 ```sql
-select distinct address from medical_staffs;
+select distinct address
+from medical_staffs;
 ```
+
 | address |
 | :--- |
 | Выкса |
 | Починки |
 | Вознесенское |
 | Навашино |
+
 ```sql
-select distinct establishment from place_of_works;
+select distinct establishment
+from place_of_works;
 ```
+
 | establishment |
 | :--- |
 | Травм. пункт |
@@ -166,8 +190,10 @@ select distinct establishment from place_of_works;
 | Районная больница |
 
 ```sql
-select distinct date from labor_activity;
+select distinct date
+from labor_activity;
 ```
+
 | date |
 | :--- |
 | Четверг |
@@ -177,11 +203,13 @@ select distinct date from labor_activity;
 | Суббота |
 
 № 5
+
 ```sql
-select  contract,date
+select contract, date
 from labor_activity
-where payment>=14000;
+where payment >= 14000;
 ```
+
 | contract | date |
 | :--- | :--- |
 | 51040 | Понедельник |
@@ -205,6 +233,7 @@ from medical_staffs
 where address = 'Навашино'
    or address = 'Выкса';
 ```
+
 | address | tax |
 | :--- | :--- |
 | Выкса | 10 |
@@ -217,12 +246,14 @@ where cost > 10000
   and name LIKE '%Инъекция%'
 order by strong_point, cost;
 ```
+
 | name | strong\_point | cost |
 | :--- | :--- | :--- |
 | Инъекция поливитаминов | Навашино | 11000 |
 | Инъекция алоэ | Навашино | 11000 |
 
 № 6
+
 ```sql
 select date, surname, establishment, name
 from medical_staffs,
@@ -233,6 +264,7 @@ where medical_stuff = medical_staffs.id
   and place_of_work = place_of_works.id
   and type_of_operation = types_of_operations.id
 ```
+
 | date | surname | establishment | name |
 | :--- | :--- | :--- | :--- |
 | Понедельник | Медина | Районная больница | Флюорография |
@@ -254,13 +286,13 @@ where medical_stuff = medical_staffs.id
 | Суббота | Бессонов | Травм. пункт | Инъекция поливитаминов |
 
 ```sql
-select date, establishment, quantity,payment
-from
-     labor_activity,
+select date, establishment, quantity, payment
+from labor_activity,
      place_of_works
 where place_of_work = place_of_works.id
 order by payment
 ```
+
 | date | establishment | quantity | payment |
 | :--- | :--- | :--- | :--- |
 | Пятница | Род. дом | 1 | 10000 |
@@ -281,8 +313,8 @@ order by payment
 | Четверг | Больница | 4 | 44000 |
 | Четверг | Травм. пункт | 4 | 44000 |
 
-
 № 7
+
 ```sql
 select surname, address
 from labor_activity,
@@ -293,6 +325,7 @@ where medical_stuff = medical_staffs.id
   and name = 'Наложение гипса'
   and quantity > 1
 ```
+
 | surname | address |
 | :--- | :--- |
 | Губанов | Выкса |
@@ -308,6 +341,7 @@ where place_of_work = place_of_works.id
   and (address = 'Выкса' or address = 'Вознесенское')
   and establishment LIKE '%больница%';
 ```
+
 | name | address |
 | :--- | :--- |
 | Флюорография | Вознесенское |
@@ -321,6 +355,7 @@ where tax >= 7
   and place_of_works.address = medical_staffs.address
 order by tax, deduction_to_the_local_budget
 ```
+
 | establishment | deduction\_to\_the\_local\_budget | surname |
 | :--- | :--- | :--- |
 | Травм. пункт | 3 | Губанов |
@@ -339,6 +374,7 @@ where type_of_operation = types_of_operations.id
   and cost > 7000
   and quantity > 1;
 ```
+
 | date | type\_of\_operation | surname |
 | :--- | :--- | :--- |
 | Понедельник | 4 | Губанов |
@@ -351,14 +387,70 @@ where type_of_operation = types_of_operations.id
 | Суббота | 4 | Боева |
 | Суббота | 3 | Бессонов |
 
-№ 7
-```sql
-```
-
-
+№ 8 
+Создать запрос для модификации всех значений столбца с суммарной величиной оплаты, чтобы он содержал истинную сумму,
+получаемую медперсоналом ( за вычетом налога). Вывести новые значения.
 
 ```sql
+UPDATE labor_activity
+SET payment = payment / 100 * (100 - (SELECT tax FROM medical_staffs WHERE id = medical_stuff));
+
+SELECT *
+FROM labor_activity;
 ```
+
+| contract | date | medical\_stuff | place\_of\_work | type\_of\_operation | quantity | payment |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 51040 | Понедельник | 1 | 1 | 7 | 4 | 17200 |
+| 51041 | Понедельник | 3 | 3 | 6 | 1 | 27000 |
+| 51042 | Понедельник | 4 | 3 | 4 | 3 | 29700 |
+| 51043 | Понедельник | 4 | 5 | 1 | 2 | 32400 |
+| 51044 | Понедельник | 4 | 4 | 6 | 1 | 27000 |
+| 51045 | Среда | 2 | 2 | 5 | 3 | 25800 |
+| 51046 | Четверг | 3 | 6 | 4 | 4 | 39600 |
+| 51047 | Четверг | 4 | 6 | 2 | 1 | 12600 |
+| 51048 | Четверг | 5 | 3 | 3 | 4 | 41800 |
+| 51049 | Пятница | 2 | 4 | 5 | 1 | 8600 |
+| 51050 | Пятница | 3 | 6 | 4 | 2 | 19800 |
+| 51051 | Пятница | 3 | 3 | 1 | 2 | 32400 |
+| 51052 | Пятница | 5 | 3 | 2 | 1 | 13300 |
+| 51053 | Суббота | 3 | 2 | 7 | 2 | 9000 |
+| 51054 | Суббота | 4 | 6 | 4 | 1 | 9900 |
+| 51055 | Суббота | 5 | 5 | 4 | 2 | 20900 |
+| 51056 | Суббота | 3 | 6 | 3 | 2 | 19800 |
+
+№9 
+Расширить таблицу с данными об операциях столбцом, содержащим величину отчислений в местный бюджет для
+мед.учреждения, где проводилась операция. Создать запрос для ввода конкретных значений во все строки таблицы операций.
+
+```sql
+ALTER TABLE labor_activity
+    ADD COLUMN deduction_to_the_local_budget INT;
+UPDATE labor_activity
+SET deduction_to_the_local_budget=(SELECT place_of_works.deduction_to_the_local_budget
+                                   FROM place_of_works
+                                   WHERE id = labor_activity.place_of_work) * (payment / 100)
+```
+
+| contract | date | medical\_stuff | place\_of\_work | type\_of\_operation | quantity | payment | deduction\_to\_the\_local\_budget |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 51040 | Понедельник | 1 | 1 | 7 | 4 | 17200 | 1720 |
+| 51041 | Понедельник | 3 | 3 | 6 | 1 | 27000 | 1080 |
+| 51042 | Понедельник | 4 | 3 | 4 | 3 | 29700 | 1188 |
+| 51043 | Понедельник | 4 | 5 | 1 | 2 | 32400 | 1296 |
+| 51044 | Понедельник | 4 | 4 | 6 | 1 | 27000 | 3240 |
+| 51045 | Среда | 2 | 2 | 5 | 3 | 25800 | 774 |
+| 51046 | Четверг | 3 | 6 | 4 | 4 | 39600 | 1188 |
+| 51047 | Четверг | 4 | 6 | 2 | 1 | 12600 | 378 |
+| 51048 | Четверг | 5 | 3 | 3 | 4 | 41800 | 1672 |
+| 51049 | Пятница | 2 | 4 | 5 | 1 | 8600 | 1032 |
+| 51050 | Пятница | 3 | 6 | 4 | 2 | 19800 | 594 |
+| 51051 | Пятница | 3 | 3 | 1 | 2 | 32400 | 1296 |
+| 51052 | Пятница | 5 | 3 | 2 | 1 | 13300 | 532 |
+| 51053 | Суббота | 3 | 2 | 7 | 2 | 9000 | 270 |
+| 51054 | Суббота | 4 | 6 | 4 | 1 | 9900 | 297 |
+| 51055 | Суббота | 5 | 5 | 4 | 2 | 20900 | 836 |
+| 51056 | Суббота | 3 | 6 | 3 | 2 | 19800 | 594 |
 
 ```sql
 ```
