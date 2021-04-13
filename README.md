@@ -659,5 +659,216 @@ FROM medical_staffs;
 | Починки |
 | Вознесенское |
 
+№13
+Используя операцию EXISTS ( NOT EXISTS ) реализовать нижеследующие запросы. В случае, если для текущего состояния БД запрос будет выдавать пустое множество строк, требуется указать какие добавления в БД необходимо провести.
+
+a) определить тот медперсонал, который не работал в субботу;
+```sql
+SELECT *
+FROM medical_staffs
+WHERE NOT EXISTS
+          (SELECT *
+           FROM labor_activity
+           WHERE date LIKE 'Суббота'
+             and labor_activity.medical_stuff = id);
+```
+| id | surname | address | tax |
+| :--- | :--- | :--- | :--- |
+| 1 | Медина | Вознесенское | 14 |
+| 2 | Севастьянов | Навашино | 14 |
+
+b) найти такие операции, которые проводились всеми врачами в Выксе;
+НАйти операции, которые провродились только в выксе?
+или найти операции, которые проводились всеми врачами из Выксы?
+```sql
+SELECT *
+FROM types_of_operations
+WHERE EXISTS
+          (SELECT *
+           FROM labor_activity
+           WHERE type_of_operation = id
+             AND place_of_work IN (
+               SELECT id
+               FROM place_of_works
+               WHERE address = 'Выкса'
+           )
+             AND NOT EXISTS
+               (SELECT *
+                FROM labor_activity
+                WHERE place_of_work NOT IN (
+                    SELECT id
+                    FROM place_of_works
+                    WHERE address = 'Выкса'
+                )
+                  AND type_of_operation = id
+               ));
+```
+c) определить те места работы, где не делали УЗИ более раза;
+```sql
+SELECT *
+FROM place_of_works
+WHERE EXISTS
+          (SELECT count(*) <= 1
+           FROM labor_activity
+           WHERE place_of_work = id
+             AND type_of_operation IN (
+               SELECT id
+               FROM types_of_operations
+               WHERE name = 'УЗИ'
+           ));
+```
+d) определить места работы, где работали все врачи из чужих населенных пунктов.
+места работы, где существует такое, что там работали все врачи из других пунктов
+места работы, где не существует такого, что там работали не все врачи из дрпугих населенных пунктов.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+```sql
+SELECT *
+FROM place_of_works
+WHERE NOT EXISTS
+    (
+        SELECT *
+        FROM labor_activity la
+        WHERE place_of_work = id
+          AND medical_stuff NOT IN (
+            SELECT id
+            FROM medical_staffs
+            WHERE medical_staffs.address != place_of_works.address
+        )
+    )
+```
+№14
+Реализовать запросы с использованием аггрегатных функций:
+
+a) найти число различных мест работы для медперсонала, работавшего в мед.учреждениях Выксы;
+```sql
+SELECT count(DISTINCT place_of_work)
+FROM labor_activity
+WHERE medical_stuff IN (
+SELECT medical_stuff
+FROM labor_activity
+WHERE place_of_work = (SELECT id FROM place_of_works WHERE address='Выкса'));
+```
+| count |
+| :--- |
+| 4 |
+
+б) определить средний размер налога для медперсонала, производившего иньекции;
+```sql
+SELECT AVG(tax) AS AVERAGE_TAX
+FROM medical_staffs
+WHERE id IN (
+SELECT medical_stuff
+FROM labor_activity
+WHERE type_of_operation IN (SELECT id FROM types_of_operations WHERE name LIKE 'Инъекция%'));
+```
+| average\_tax |
+| :--- |
+| 8.3333333333333333 |
+
+c) кто из медперсонала делал операцию с минимальной стоимостью;
+```sql
+SELECT *
+FROM medical_staffs
+WHERE id IN (
+    SELECT medical_stuff
+    FROM labor_activity
+    WHERE type_of_operation IN
+          (SELECT id
+           FROM types_of_operations
+           WHERE cost IN (SELECT min(cost)
+                          FROM types_of_operations
+           )));
+```
+| id | surname | address | tax |
+| :--- | :--- | :--- | :--- |
+| 1 | Медина | Вознесенское | 14 |
+| 3 | Бессонов | Выкса | 10 |
+
+d) определить количество операций стоимостью не более 15000, проведенных в понедельник Губановым .
+```sql
+SELECT sum(quantity) AS QUANTITY_OF_OPERATIONS
+FROM labor_activity
+WHERE medical_stuff = (SELECT id FROM medical_staffs WHERE surname='Губанов')
+AND date = 'Понедельник'
+AND (SELECT cost FROM types_of_operations WHERE id=type_of_operation) <= 15000;
+```
+| quantity\_of\_operations |
+| :--- |
+| 3 |
+№15.
+
+Используя средства группировки реализовать следующие запросы:
+
+a) определить для каждого дня недели и каждой операции сколько раз ее проводили;
+```sql
+SELECT date, type_of_operation, SUM(quantity) as count
+FROM labor_activity
+GROUP BY date, type_of_operation;
+```
+| date | type\_of\_operation | count |
+| :--- | :--- | :--- |
+| Понедельник | 6 | 2 |
+| Понедельник | 4 | 3 |
+| Понедельник | 1 | 2 |
+| Понедельник | 7 | 4 |
+| Пятница | 5 | 1 |
+| Пятница | 4 | 2 |
+| Пятница | 2 | 1 |
+| Пятница | 1 | 2 |
+| Среда | 5 | 3 |
+| Суббота | 3 | 2 |
+| Суббота | 7 | 2 |
+| Суббота | 4 | 3 |
+| Четверг | 4 | 4 |
+| Четверг | 3 | 4 |
+| Четверг | 2 | 1 |
+
+b) найти для каждого медработника среднюю стоимость всех проведенных им операций;
+
+```sql
+SELECT ms.surname, AVG(cost) as avg_cost
+FROM labor_activity la
+INNER JOIN types_of_operations top ON top.id = la.type_of_operation
+INNER JOIN medical_staffs ms ON ms.id = la.medical_stuff
+GROUP BY ms.surname
+ORDER BY avg_cost;
+```
+| surname | avg\_cost |
+| :--- | :--- |
+| Медина | 5000 |
+| Севастьянов | 10000 |
+| Боева | 12000 |
+| Бессонов | 14333.333333333333 |
+| Губанов | 16800 |
+
+c) определить те мед.учреждения, где 
+суммарная величина стоимости всех проведенных в них операций была более 30000;
+```sql
+SELECT pow.address, pow.establishment
+FROM labor_activity la
+INNER JOIN place_of_works pow ON pow.id = la.place_of_work
+INNER JOIN types_of_operations top ON top.id = la.type_of_operation
+GROUP BY pow.address, pow.establishment
+HAVING SUM(cost) < 30000;
+```
+| address | establishment |
+| :--- | :--- |
+| Вознесенское | Районная больница |
+| Выкса | Травм. пункт |
+| Починки | Больница |
+
+d) для каждого дня недели найти число проведенных в этот день операций.
+```sql
+SELECT date, SUM(quantity)
+FROM labor_activity la
+GROUP BY date;
+```
+| date | sum |
+| :--- | :--- |
+| Пятница | 6 |
+| Среда | 3 |
+| Суббота | 7 |
+| Четверг | 9 |
+| Понедельник | 11 |
 
 
