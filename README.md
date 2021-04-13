@@ -705,37 +705,67 @@ WHERE EXISTS
 ```
 c) определить те места работы, где не делали УЗИ более раза;
 ```sql
+INSERT INTO labor_activity (contract, date, medical_stuff, place_of_work, type_of_operation, quantity, payment,
+                            deduction_to_the_local_budget)
+values (51057, 'Суббота', 1, 3, 6, 2, 24080, 963);
+
+
 SELECT *
 FROM place_of_works
-WHERE EXISTS
+WHERE
           (SELECT count(*) <= 1
-           FROM labor_activity
-           WHERE place_of_work = id
-             AND type_of_operation IN (
-               SELECT id
-               FROM types_of_operations
-               WHERE name = 'УЗИ'
-           ));
+           FROM labor_activity la
+          INNER JOIN types_of_operations top on top.id = la.type_of_operation
+           WHERE place_of_work = place_of_works.id
+              AND top.name='УЗИ');
+
+DELETE
+FROM labor_activity
+WHERE contract = 51057;
 ```
+
+| id | establishment | address | deduction\_to\_the\_local\_budget |
+| :--- | :--- | :--- | :--- |
+| 1 | Районная больница | Вознесенское | 10 |
+| 2 | Травм. пункт | Выкса | 3 |
+| 4 | Род. дом | Вознесенское | 12 |
+| 5 | Больница | Починки | 4 |
+| 6 | Травм. пункт | Лукояново | 3 |
+
+
 d) определить места работы, где работали все врачи из чужих населенных пунктов.
-места работы, где существует такое, что там работали все врачи из других пунктов
-места работы, где не существует такого, что там работали не все врачи из дрпугих населенных пунктов.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ```sql
-SELECT *
-FROM place_of_works
-WHERE NOT EXISTS
-    (
-        SELECT *
-        FROM labor_activity la
-        WHERE place_of_work = id
-          AND medical_stuff NOT IN (
-            SELECT id
-            FROM medical_staffs
-            WHERE medical_staffs.address != place_of_works.address
-        )
-    )
+INSERT INTO labor_activity (contract, date, medical_stuff, place_of_work, type_of_operation, quantity, payment,
+                            deduction_to_the_local_budget)
+values (51057, 'Суббота', 1, 3, 2, 2, 24080, 963);
+
+
+SELECT pw.id, pw.establishment, pw.address
+FROM place_of_works pw
+WHERE (
+          (SELECT count(DISTINCT la.medical_stuff)
+           FROM labor_activity la
+                    INNER JOIN medical_staffs ms on ms.id = la.medical_stuff
+           WHERE place_of_work = pw.id
+             AND ms.address != pw.address) =
+          (SELECT count(*) FROM medical_staffs WHERE medical_staffs.address != pw.address)
+      );
+
+
+DELETE
+FROM labor_activity
+WHERE contract = 51057;
 ```
+Здесь мы вставили в лаейбор активити новую строку, 
+чтобы сделать в Больнице НАвашино ситацию, 
+когда там поработали все врачи из других населенных пунктов.
+
+| id | establishment | address |
+| :--- | :--- | :--- |
+| 3 | Больница | Навашино |
+
+
 №14
 Реализовать запросы с использованием аггрегатных функций:
 
