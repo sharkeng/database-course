@@ -825,6 +825,7 @@ AND (SELECT cost FROM types_of_operations WHERE id=type_of_operation) <= 15000;
 | quantity\_of\_operations |
 | :--- |
 | 3 |
+
 №15.
 
 Используя средства группировки реализовать следующие запросы:
